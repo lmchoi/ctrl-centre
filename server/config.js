@@ -22,7 +22,11 @@ export const config = {
   host: process.env.HOST || '127.0.0.1',
 };
 
-/** Path shown in the UI footer, with $HOME collapsed to `~`. */
+/**
+ * Path shown in the UI footer, with $HOME collapsed to `~`.
+ * @param {string} filePath
+ * @returns {string}
+ */
 export function displayPath(filePath) {
   const home = os.homedir();
   return filePath.startsWith(home + path.sep)

@@ -11,7 +11,16 @@ import path from 'node:path';
  */
 const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ctrl-centre-http-'));
 const file = path.join(dir, 'todos.md');
-process.env.CTRL_CENTRE_TODO_FILE = file;
+process.env.CTRL_CENTRE_DIR = dir;
+
+/**
+ * Guard, not decoration: if the env var above ever stops being what config
+ * reads, this suite would silently exercise the real ~/.ctrl-centre/todos.md
+ * and mutate the user's actual todos. Fail loudly instead, before the store is
+ * ever constructed.
+ */
+const { config } = await import('../server/config.js');
+assert.equal(config.todoFile, file, 'suite must be pointed at its temp directory');
 
 const { createServer } = await import('../server/index.js');
 

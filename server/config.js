@@ -2,22 +2,36 @@ import os from 'node:os';
 import path from 'node:path';
 
 /**
- * The todo markdown file deliberately lives OUTSIDE this repo so personal todos
- * are never committed. Override with CTRL_CENTRE_TODO_FILE.
+ * Personal data deliberately lives OUTSIDE this repo so it is never committed:
+ * one directory, one markdown file per panel. Override with CTRL_CENTRE_DIR.
+ * See ADR 0007 — CTRL_CENTRE_TODO_FILE is no longer read.
  */
-const DEFAULT_TODO_FILE = path.join(os.homedir(), '.ctrl-centre', 'todos.md');
+const DEFAULT_DIR = path.join(os.homedir(), '.ctrl-centre');
 
-function resolveTodoFile() {
-  const raw = process.env.CTRL_CENTRE_TODO_FILE;
-  if (!raw || !raw.trim()) return DEFAULT_TODO_FILE;
-  const expanded = raw.startsWith('~')
-    ? path.join(os.homedir(), raw.slice(1))
-    : raw;
+/**
+ * Resolve the data directory from a raw env value.
+ *
+ * Exported so it can be tested directly: `config` below is evaluated once at
+ * import time, so testing several values through the env would otherwise need
+ * cache-busting dynamic imports.
+ *
+ * @param {string | undefined} raw
+ * @returns {string} absolute path
+ */
+export function resolveDataDir(raw) {
+  if (!raw || !raw.trim()) return DEFAULT_DIR;
+  const trimmed = raw.trim();
+  const expanded = trimmed.startsWith('~')
+    ? path.join(os.homedir(), trimmed.slice(1))
+    : trimmed;
   return path.resolve(expanded);
 }
 
+const dir = resolveDataDir(process.env.CTRL_CENTRE_DIR);
+
 export const config = {
-  todoFile: resolveTodoFile(),
+  dir,
+  todoFile: path.join(dir, 'todos.md'),
   port: Number(process.env.PORT) || 4242,
   host: process.env.HOST || '127.0.0.1',
 };

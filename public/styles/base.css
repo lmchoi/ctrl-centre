@@ -1,0 +1,101 @@
+* { box-sizing: border-box }
+body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); font-size: var(--text-base); line-height: var(--leading-normal); -webkit-font-smoothing: antialiased }
+::selection { background: var(--selection); color: var(--selection-foreground) }
+.mono { font-family: var(--font-mono) }
+
+/* Button */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); border-radius: var(--radius-md); font-family: var(--font-sans); font-weight: var(--weight-medium); font-size: var(--text-sm); border: 1px solid transparent; cursor: pointer; transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast), opacity var(--duration-fast), transform var(--duration-fast); white-space: nowrap; padding: 0 var(--space-4); height: 2.25rem }
+.btn:active { transform: scale(0.97) }
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.78 0.13 222/0.35) }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none }
+.btn-primary { background: var(--primary); color: var(--primary-foreground) }
+.btn-primary:hover { background: oklch(0.85 0.11 220) }
+.btn-secondary { background: var(--secondary); color: var(--secondary-foreground) }
+.btn-secondary:hover { background: var(--gray-700) }
+.btn-outline { background: transparent; border-color: var(--border); color: var(--foreground) }
+.btn-outline:hover { background: var(--accent) }
+.btn-ghost { background: transparent; color: var(--foreground) }
+.btn-ghost:hover { background: var(--accent) }
+.btn-destructive { background: var(--destructive); color: var(--destructive-foreground) }
+.btn-destructive:hover { background: oklch(0.63 0.2 24) }
+.btn-link { background: none; color: var(--primary); padding: 0; height: auto; text-underline-offset: 4px }
+.btn-link:hover { text-decoration: underline }
+.btn-sm { height: 1.875rem; padding: 0 var(--space-3); font-size: var(--text-xs) }
+.btn-lg { height: 2.625rem; padding: 0 var(--space-6); font-size: var(--text-base) }
+.btn-icon { width: 2.25rem; height: 2.25rem; padding: 0 }
+
+/* Input / Textarea / Select */
+.field { width: 100%; background: oklch(1 0 0/4%); border: 1px solid var(--input); border-radius: var(--radius-md); color: var(--foreground); font-family: var(--font-sans); font-size: var(--text-sm); padding: 0 var(--space-3); height: 2.25rem; transition: border-color var(--duration-fast), box-shadow var(--duration-fast) }
+.field::placeholder { color: var(--muted-foreground) }
+.field:focus { outline: none; border-color: var(--ring); box-shadow: 0 0 0 3px oklch(0.78 0.13 222/0.22) }
+.field:disabled { opacity: 0.5; cursor: not-allowed }
+textarea.field { height: auto; padding: var(--space-3); resize: vertical; line-height: var(--leading-normal) }
+
+/* Card */
+.card { background: var(--card); color: var(--card-foreground); border: 1px solid var(--card-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm) }
+.card-header { padding: var(--space-5) var(--space-5) 0 }
+.card-content { padding: var(--space-5) }
+.card-footer { padding: 0 var(--space-5) var(--space-5); display: flex; align-items: center; gap: var(--space-2) }
+.card-title { font-size: var(--text-lg); font-weight: var(--weight-semibold); letter-spacing: var(--tracking-tight); margin: 0 }
+.card-desc { font-size: var(--text-sm); color: var(--muted-foreground); margin: var(--space-1) 0 0 }
+
+/* Badge */
+.badge { display: inline-flex; align-items: center; gap: var(--space-1); border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: var(--weight-medium); padding: 0.1rem var(--space-2); line-height: 1.6; border: 1px solid transparent }
+.badge-default { background: var(--primary); color: var(--primary-foreground) }
+.badge-secondary { background: var(--secondary); color: var(--secondary-foreground) }
+.badge-outline { border-color: var(--border); color: var(--foreground) }
+.badge-success { background: oklch(0.76 0.16 152/0.16); color: var(--success) }
+.badge-warning { background: oklch(0.82 0.15 78/0.16); color: var(--warning) }
+.badge-destructive { background: oklch(0.68 0.19 22/0.16); color: var(--destructive) }
+
+/* Checkbox / Switch */
+.checkbox { width: 1rem; height: 1rem; border-radius: 0.25rem; border: 1px solid var(--input); background: oklch(1 0 0/4%); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background var(--duration-fast), border-color var(--duration-fast); padding: 0; flex-shrink: 0 }
+.checkbox[data-checked="true"] { background: var(--primary); border-color: var(--primary) }
+.checkbox svg { width: 0.7rem; height: 0.7rem; color: var(--primary-foreground) }
+.switch { width: 2.25rem; height: 1.25rem; border-radius: var(--radius-full); background: var(--gray-700); border: none; position: relative; cursor: pointer; transition: background var(--duration-normal) var(--ease-out); padding: 0 }
+.switch[data-checked="true"] { background: var(--primary) }
+.switch-thumb { position: absolute; top: 0.125rem; left: 0.125rem; width: 1rem; height: 1rem; border-radius: 50%; background: var(--gray-50); transition: transform var(--duration-normal) var(--ease-out) }
+.switch[data-checked="true"] .switch-thumb { transform: translateX(1rem) }
+
+/* Label */
+.label { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--foreground); display: flex; align-items: center; gap: var(--space-2) }
+
+/* Tabs */
+.tabs-list { display: inline-flex; gap: var(--space-1); background: var(--muted); border-radius: var(--radius-md); padding: 0.2rem }
+.tabs-trigger { border: none; background: transparent; color: var(--muted-foreground); font-family: var(--font-sans); font-size: var(--text-sm); font-weight: var(--weight-medium); padding: 0.35rem var(--space-3); border-radius: calc(var(--radius-md) - 2px); cursor: pointer; transition: background var(--duration-fast), color var(--duration-fast) }
+.tabs-trigger[data-active="true"] { background: var(--surface); color: var(--foreground); box-shadow: var(--shadow-sm) }
+
+/* Progress */
+.progress { width: 100%; height: 0.4rem; border-radius: var(--radius-full); background: var(--muted); overflow: hidden }
+.progress-bar { height: 100%; background: var(--primary); border-radius: var(--radius-full); transition: width var(--duration-slow) var(--ease-out) }
+
+/* Separator */
+.separator { background: var(--border); border: none }
+.separator-h { height: 1px; width: 100% }
+.separator-v { width: 1px; height: 100% }
+
+/* Tooltip */
+.tooltip { background: var(--popover); color: var(--popover-foreground); font-size: var(--text-xs); padding: 0.3rem var(--space-2); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); border: 1px solid var(--border) }
+
+/* Dialog */
+.dialog-overlay { position: fixed; inset: 0; background: oklch(0 0 0/0.6); backdrop-filter: blur(2px) }
+.dialog-content { background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: var(--space-6) }
+.dialog-title { font-size: var(--text-lg); font-weight: var(--weight-semibold); margin: 0 }
+.dialog-desc { font-size: var(--text-sm); color: var(--muted-foreground); margin: var(--space-1) 0 0 }
+
+/* Table */
+.table { width: 100%; border-collapse: collapse; font-size: var(--text-sm) }
+.table th { text-align: left; color: var(--muted-foreground); font-weight: var(--weight-medium); padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-wide) }
+.table td { padding: var(--space-3); border-bottom: 1px solid var(--border) }
+.table tr:last-child td { border-bottom: none }
+
+/* Kbd */
+.kbd { display: inline-flex; align-items: center; justify-content: center; height: 1.25rem; min-width: 1.25rem; padding: 0 0.3rem; border-radius: 0.25rem; background: var(--muted); color: var(--muted-foreground); font-family: var(--font-mono); font-size: var(--text-xs); border: 1px solid var(--border) }
+
+/* Slider */
+.slider-track { position: relative; height: 0.3rem; border-radius: var(--radius-full); background: var(--muted); width: 100% }
+.slider-range { position: absolute; height: 100%; border-radius: var(--radius-full); background: var(--primary) }
+.slider-thumb { position: absolute; top: 50%; width: 1rem; height: 1rem; border-radius: 50%; background: var(--gray-50); border: 2px solid var(--primary); transform: translate(-50%, -50%); cursor: pointer }
+
+/* Status dot */
+.status-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; display: inline-block }

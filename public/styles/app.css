@@ -67,6 +67,29 @@ a:hover { color: var(--cyan-300); }
   max-width: 60%; text-align: right; flex-shrink: 1; min-width: 0;
 }
 
+/* Journal panel */
+.journal-compose { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+.journal-list { display: flex; flex-direction: column; gap: 2px; max-height: 420px; overflow: auto; }
+.journal-row {
+  display: flex; flex-direction: column; gap: 4px; padding: 12px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.journal-row:last-child { border-bottom: none; }
+.journal-row-header { display: flex; align-items: center; justify-content: space-between; }
+.journal-date { font-size: 12px; color: var(--muted-foreground); }
+.journal-text {
+  font-size: 14px; color: var(--foreground); line-height: 1.55;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.journal-empty { padding: 24px 4px; color: var(--muted-foreground); font-size: 13px; }
+.journal-storage {
+  font-size: 12px; color: var(--muted-foreground); margin-left: auto;
+  /* Long paths must ellipsize, not wrap the footer onto three lines. */
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 60%; text-align: right; flex-shrink: 1; min-width: 0;
+}
+
 .banner {
   display: none; align-items: center; gap: var(--space-2); margin-bottom: 16px;
   padding: var(--space-3); border-radius: var(--radius-md); font-size: var(--text-sm);

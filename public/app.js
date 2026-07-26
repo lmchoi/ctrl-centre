@@ -1,5 +1,6 @@
 import { el, clear, byId } from './lib/dom.js';
 import { todoPanel } from './panels/todo.js';
+import { journalPanel } from './panels/journal.js';
 
 /** @typedef {import('../types.d.ts').PanelEntry} PanelEntry */
 
@@ -12,6 +13,7 @@ import { todoPanel } from './panels/todo.js';
 const PANELS = [
   { id: 'overview', label: 'Overview', icon: '◧', panel: null },
   { id: 'tasks', label: 'Tasks', icon: '☑', panel: todoPanel },
+  { id: 'journal', label: 'Journal', icon: '◨', panel: journalPanel },
   { id: 'habits', label: 'Habits', icon: '◔', panel: null },
   { id: 'systems', label: 'Systems', icon: '▣', panel: null },
   { id: 'notes', label: 'Notes', icon: '▤', panel: null },

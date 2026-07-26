@@ -1,5 +1,7 @@
 # ctrl-centre
 
+[![CI](https://github.com/lmchoi/ctrl-centre/actions/workflows/ci.yml/badge.svg)](https://github.com/lmchoi/ctrl-centre/actions/workflows/ci.yml)
+
 A personal dashboard. One panel for now — **Tasks**, backed by a plain markdown
 file that lives outside this repo.
 

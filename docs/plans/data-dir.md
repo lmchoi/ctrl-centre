@@ -67,3 +67,27 @@ todos as markdown outside the repo, the first-run template, and the
 2. Record the directory decision as ADR 0007 and update the docs — test: none
    beyond `npm run check`; docs-only, verified by reading `npm run todo:path`
    output against what CLAUDE.md now tells an agent to run.
+
+## Status
+
+Both commits done. 59 tests pass (49 before, 10 new in `test/config.test.js`).
+
+Deviations from the plan:
+
+- Commit 1 also added a guard to `test/server.test.js` asserting the suite is
+  pointed at its temp directory before the store is constructed, and CLAUDE.md
+  gained a line telling future suites to keep it. Not in the original plan —
+  added because the red step of this very slice wrote a task into the real
+  `~/.ctrl-centre/todos.md`: the test set `CTRL_CENTRE_DIR` while `config.js`
+  still read `CTRL_CENTRE_TODO_FILE`, so resolution fell back to the default
+  path. No data was lost (the file held only its header) but the guard is the
+  fix for the class of mistake, not just this instance.
+- `server/todos.js` had a comment naming the old variable; updated in commit 2.
+
+Verified:
+
+- `npm run check` green with `HOME` pointed at an empty temp directory, and
+  nothing created at the default location in that run — the suite no longer
+  reaches the real data directory.
+- `npm run todo:path` agrees with the `echo "${CTRL_CENTRE_DIR:-…}/todos.md"`
+  fallback documented in CLAUDE.md, both with and without the var set.

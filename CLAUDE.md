@@ -5,10 +5,12 @@ build step. `npm start` serves http://127.0.0.1:4242.
 
 ```
 server/index.js    HTTP: static files + JSON API
-server/todos.js    markdown parse / serialize / mutate
+server/todos.js    todo markdown parse / serialize / mutate
+server/journal.js  journal markdown parse / serialize / mutate
 server/config.js   data directory + port resolution
 public/app.js      panel registry, sidebar, clock
 public/panels/     one module per panel
+public/lib/        el()/clear()/api() + shared card & banner builders
 public/styles/     Console design system (tokens.css, base.css) + app.css
 types.d.ts         shapes shared between server and client
 test/              node --test suites
@@ -75,13 +77,55 @@ The same spec is embedded as a comment block at the top of newly created todo
 files (`FILE_TEMPLATE` in `server/todos.js`) — keep the two in sync if you
 change the grammar.
 
+## Editing the user's journal
+
+Same data directory, same rules about never committing it:
+`${CTRL_CENTRE_DIR:-$HOME/.ctrl-centre}/journal.md`. Plain markdown, safe to
+edit with normal file tools.
+
+### Format
+
+An entry is a `## YYYY-MM-DD HH:MM` heading — local wall-clock, nothing else on
+the line — and everything up to the next h1 or h2 heading is its text:
+
+```markdown
+## 2026-07-26 14:32
+
+Entry text. Unlike a task, it may span several lines
+and contain blank lines.
+```
+
+- **Newest first.** New entries go directly after the preamble, above the
+  existing ones.
+- Entry text **may contain newlines** — the sharpest difference from todos,
+  where one task is always one line.
+- A `###` heading or deeper stays *inside* the entry it sits under. A
+  non-timestamp `##`, or any `#`, ends the entry and is preserved as free text.
+- Headings inside HTML comments or fenced code blocks are **not** entries —
+  that is how the file's own header documents the format.
+- An entry region owns its trailing blank line, so deleting one leaves exactly
+  one blank line between its neighbours. Don't hand-tidy blank lines around
+  entries; the parser depends on that shape staying canonical.
+- Trailing whitespace on a line is preserved (two spaces is a markdown hard
+  break), so don't strip it.
+- As with todos: refresh the browser to see an outside edit.
+
+The same spec is embedded in `FILE_TEMPLATE` in `server/journal.js` — keep the
+two in sync if you change the grammar.
+
 ## Adding a panel
 
 Create `public/panels/<name>.js` exporting
 `{ id, label, icon, title, mount(host) → cleanup? }`, import it in
 `public/app.js`, and replace that entry's `panel: null` in the `PANELS`
-registry. The sidebar entry enables itself. Server state, if needed, goes
-behind a new `/api/<name>` route in `server/index.js`.
+registry (or add a new entry). The sidebar entry enables itself. Server state,
+if needed, goes behind a new `/api/<name>` route in `server/index.js`.
+
+Build the card scaffold, error banner and footer path label with the helpers in
+`public/lib/components.js` rather than by hand
+([ADR 0008](docs/adr/0008-shared-component-builders-not-a-framework.md)). They
+take elements, never HTML strings — text from a data file is rendered with
+`textContent`, never `innerHTML`.
 
 ## Workflow
 

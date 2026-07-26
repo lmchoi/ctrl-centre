@@ -2,8 +2,8 @@
 
 [![CI](https://github.com/lmchoi/ctrl-centre/actions/workflows/ci.yml/badge.svg)](https://github.com/lmchoi/ctrl-centre/actions/workflows/ci.yml)
 
-A personal dashboard. One panel for now — **Tasks**, backed by a plain markdown
-file that lives outside this repo.
+A personal dashboard. Two panels — **Tasks** and **Journal** — each backed by a
+plain markdown file that lives outside this repo.
 
 No runtime dependencies, no build step. Node 20+.
 
@@ -22,8 +22,8 @@ installed. See [docs/adr](docs/adr/) for why things are built this way.
 ## Where your data lives
 
 One directory outside this repo, one markdown file per panel. By default
-`~/.ctrl-centre/`, holding `todos.md`, created on first run. Nothing personal is
-ever written into this repo.
+`~/.ctrl-centre/`, holding `todos.md` and `journal.md`, each created on first
+use. Nothing personal is ever written into this repo.
 
 Point it somewhere else (a Dropbox/iCloud folder, a notes vault) with:
 
@@ -35,7 +35,7 @@ CTRL_CENTRE_DIR=~/Documents/notes/ctrl-centre npm start
 
 Other env vars: `PORT` (default `4242`), `HOST` (default `127.0.0.1`).
 
-## The file format
+## The todo file format
 
 Any GitHub-style checklist line is a task:
 
@@ -64,6 +64,29 @@ this repo, plus `npm run todo:path` to locate the file.
 If the file changed on disk since the page loaded, the affected action is
 rejected with a conflict and the panel resyncs rather than editing the wrong
 line. Refresh the page to pick up outside edits.
+
+## The journal file format
+
+An entry is a `## YYYY-MM-DD HH:MM` heading — local time, nothing else on the
+line — and everything up to the next `##` is its text:
+
+```markdown
+# Journal
+
+## 2026-07-26 14:32
+
+Shipped the CI slice. Entry text can span several lines,
+and blank lines, unlike a task.
+
+## 2026-07-25 18:40
+
+Rotated the backup drive.
+```
+
+- Newest first. New entries land directly below the file's header.
+- A `###` heading stays inside its entry; any `#` or non-timestamp `##` ends it.
+- Trailing whitespace is preserved, so markdown hard breaks survive.
+- The same preservation and conflict rules as the todo file apply.
 
 ## Adding a panel
 

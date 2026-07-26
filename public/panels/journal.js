@@ -1,4 +1,5 @@
 import { el, clear, api } from '../lib/dom.js';
+import { card, banner, storageLabel } from '../lib/components.js';
 
 /**
  * @typedef {import('../../types.d.ts').JournalEntry} JournalEntry
@@ -48,9 +49,9 @@ export const journalPanel = {
 
     // --- Persistent chrome (built once, contents re-rendered on change) ---
     const summary = el('p', { class: 'card-desc', text: '—' });
-    const banner = el('div', { class: 'banner', role: 'status' });
+    const errorBanner = banner();
     const listEl = el('div', { class: 'journal-list' });
-    const storageLabel = el('span', { class: 'mono journal-storage', text: '' });
+    const storage = storageLabel('journal-storage');
 
     const draftText = el('textarea', {
       class: 'field',
@@ -67,20 +68,18 @@ export const journalPanel = {
       onclick: () => saveEntry(),
     });
 
-    const card = el('section', { class: 'card' }, [
-      el('div', { class: 'card-header' }, [
-        el('h2', { class: 'card-title', text: 'Journal' }),
-        summary,
-      ]),
-      el('div', { class: 'card-content' }, [
-        banner,
+    const panel = card({
+      title: 'Journal',
+      description: summary,
+      content: [
+        errorBanner.element,
         el('div', { class: 'journal-compose' }, [draftText, saveButton]),
         listEl,
-      ]),
-      el('div', { class: 'card-footer' }, [storageLabel]),
-    ]);
+      ],
+      footer: [storage.element],
+    });
 
-    clear(host).append(card);
+    clear(host).append(panel);
 
     // --- Data flow ---
 
@@ -175,11 +174,8 @@ export const journalPanel = {
         ? '1 entry'
         : `${state.entries.length} entries`;
 
-      banner.textContent = state.error;
-      banner.dataset.visible = String(Boolean(state.error));
-
-      storageLabel.textContent = state.file ? `saved to ${state.file}` : '';
-      storageLabel.title = state.file; // full path, since the label ellipsizes
+      errorBanner.show(state.error);
+      storage.show(state.file);
 
       clear(listEl);
       if (state.entries.length === 0) {

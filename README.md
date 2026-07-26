@@ -17,16 +17,19 @@ npm run check      # both
 `npm install` is only needed for `typecheck` — running the app needs nothing
 installed. See [docs/adr](docs/adr/) for why things are built this way.
 
-## Where your todos live
+## Where your data lives
 
-By default: `~/.ctrl-centre/todos.md`, created on first run. Nothing personal is
+One directory outside this repo, one markdown file per panel. By default
+`~/.ctrl-centre/`, holding `todos.md`, created on first run. Nothing personal is
 ever written into this repo.
 
 Point it somewhere else (a Dropbox/iCloud folder, a notes vault) with:
 
 ```sh
-CTRL_CENTRE_TODO_FILE=~/Documents/notes/todos.md npm start
+CTRL_CENTRE_DIR=~/Documents/notes/ctrl-centre npm start
 ```
+
+`npm run todo:path` prints the resolved todo file path.
 
 Other env vars: `PORT` (default `4242`), `HOST` (default `127.0.0.1`).
 

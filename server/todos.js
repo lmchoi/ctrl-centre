@@ -36,7 +36,7 @@ const DEFAULT_PRIORITY = 'medium';
 /**
  * Written into a newly created todo file. The comment block is the spec for
  * anyone — human or agent — who opens the file without the dashboard, so it
- * travels with the file wherever the user points CTRL_CENTRE_TODO_FILE.
+ * travels with the file wherever the user points CTRL_CENTRE_DIR.
  */
 const FILE_TEMPLATE = `# Todos
 

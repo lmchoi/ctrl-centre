@@ -54,6 +54,46 @@ export interface HttpError extends Error {
   status?: number;
 }
 
+/** A journal entry as it is sent to the client. Mirrors `toWire()` in server/journal.js. */
+export interface JournalEntry {
+  /**
+   * Position among entries in the file. NOT stable across edits — see
+   * docs/adr/0005, reused here rather than a new mechanism.
+   */
+  ordinal: number;
+  /** `YYYY-MM-DD HH:MM`, local wall-clock, as written in the file. */
+  timestamp: string;
+  /** May contain newlines — unlike a todo, an entry is not one-line-per-task. */
+  text: string;
+}
+
+/** A journal entry as it exists in the parsed document, before going over the wire. */
+export interface ParsedEntry extends JournalEntry {
+  /** Heading line, zero-based. */
+  startLine: number;
+  /** Last occupied line, trailing blanks included — not the last non-blank body line. */
+  endLine: number;
+}
+
+/** The journal file split into lines, with its entries indexed. */
+export interface JournalDocument {
+  lines: string[];
+  entries: ParsedEntry[];
+}
+
+/** What `POST /api/journal` accepts. */
+export interface NewEntry {
+  text: string;
+  /** `YYYY-MM-DD HH:MM`; falls back to the server's clock when omitted. */
+  timestamp?: string;
+}
+
+/** Identifies an entry to mutate, plus the guard against acting on the wrong one. */
+export interface EntryRef {
+  ordinal: number;
+  expectedText?: string;
+}
+
 /** A dashboard panel module. See docs/adr/0006. */
 export interface Panel {
   id: string;

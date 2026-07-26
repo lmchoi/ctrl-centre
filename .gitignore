@@ -4,5 +4,6 @@ node_modules/
 # sp slice worktrees (see CLAUDE.md → sp config).
 .claude/worktrees/
 
-# Safety net: personal todos live outside this repo (see README).
+# Safety net: personal data lives outside this repo (see README).
 todos.md
+journal.md

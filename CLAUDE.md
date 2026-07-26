@@ -6,7 +6,7 @@ build step. `npm start` serves http://127.0.0.1:4242.
 ```
 server/index.js    HTTP: static files + JSON API
 server/todos.js    markdown parse / serialize / mutate
-server/config.js   todo file path + port resolution
+server/config.js   data directory + port resolution
 public/app.js      panel registry, sidebar, clock
 public/panels/     one module per panel
 public/styles/     Console design system (tokens.css, base.css) + app.css
@@ -24,11 +24,18 @@ ADRs are immutable: supersede with a new one rather than editing.
 ## Editing the user's todos
 
 The todo file lives **outside this repo** — that is deliberate, personal todos
-must never be committed here. Resolve its path with:
+must never be committed here. It sits in the data directory named by
+`CTRL_CENTRE_DIR` (default `~/.ctrl-centre`), which holds one markdown file per
+panel ([ADR 0007](docs/adr/0007-personal-data-in-a-directory.md)). Resolve its
+path with:
 
 ```sh
-npm run todo:path          # or: echo "${CTRL_CENTRE_TODO_FILE:-$HOME/.ctrl-centre/todos.md}"
+npm run todo:path          # or: echo "${CTRL_CENTRE_DIR:-$HOME/.ctrl-centre}/todos.md"
 ```
+
+**Never point a test suite at that directory.** `test/server.test.js` asserts it
+is running against a temp directory before it constructs the store; keep that
+guard when adding suites that touch the real store.
 
 You may edit that file directly with normal file tools. It is plain markdown.
 

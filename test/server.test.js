@@ -11,16 +11,18 @@ import path from 'node:path';
  */
 const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ctrl-centre-http-'));
 const file = path.join(dir, 'todos.md');
+const journalFile = path.join(dir, 'journal.md');
 process.env.CTRL_CENTRE_DIR = dir;
 
 /**
  * Guard, not decoration: if the env var above ever stops being what config
  * reads, this suite would silently exercise the real ~/.ctrl-centre/todos.md
- * and mutate the user's actual todos. Fail loudly instead, before the store is
- * ever constructed.
+ * (and journal.md) and mutate the user's actual data. Fail loudly instead,
+ * before either store is ever constructed.
  */
 const { config } = await import('../server/config.js');
 assert.equal(config.todoFile, file, 'suite must be pointed at its temp directory');
+assert.equal(config.dir, dir, 'suite must be pointed at its temp directory');
 
 const { createServer } = await import('../server/index.js');
 
@@ -65,6 +67,17 @@ async function call(pathname, { method = 'GET', body, raw } = {}) {
 /** @param {string} contents */
 function seed(contents) {
   return fs.writeFile(file, contents, 'utf8');
+}
+
+/**
+ * The journal store creates journal.md from its template on first `list()`,
+ * and this suite shares one temp dir across the whole process (before/after
+ * only, no per-test reset) — so every journal test must seed explicitly
+ * rather than assume an empty file left by a sibling test.
+ * @param {string} contents
+ */
+function seedJournal(contents) {
+  return fs.writeFile(journalFile, contents, 'utf8');
 }
 
 describe('todo API', () => {
@@ -150,6 +163,77 @@ describe('todo API', () => {
 
   test('GET on a mutation endpoint returns 405', async () => {
     const { status } = await call('/api/todos/toggle');
+    assert.equal(status, 405);
+  });
+});
+
+describe('journal API', () => {
+  test('GET /api/journal returns the entries and the file location', async () => {
+    await seedJournal('## 2026-07-20 09:00\n\nfirst entry\n');
+    const { status, json } = await call('/api/journal');
+
+    assert.equal(status, 200);
+    assert.equal(json.entries.length, 1);
+    assert.equal(json.entries[0].text, 'first entry');
+    assert.ok(json.file, 'should report where it saved');
+  });
+
+  test('POST /api/journal creates an entry and returns 201 with the new list', async () => {
+    await seedJournal('');
+    const { status, json } = await call('/api/journal', {
+      method: 'POST',
+      body: { text: 'added entry', timestamp: '2026-07-20 09:00' },
+    });
+
+    assert.equal(status, 201);
+    assert.deepEqual(json.entries.map((/** @type {{text:string}} */ e) => e.text), ['added entry']);
+    assert.match(await fs.readFile(journalFile, 'utf8'), /added entry/);
+  });
+
+  test('POST with empty text returns 400 and the reason', async () => {
+    await seedJournal('');
+    const { status, json } = await call('/api/journal', { method: 'POST', body: { text: '  ' } });
+
+    assert.equal(status, 400);
+    assert.match(json.error, /required/i);
+  });
+
+  test('POST with a malformed timestamp returns 400', async () => {
+    await seedJournal('');
+    const { status, json } = await call('/api/journal', {
+      method: 'POST',
+      body: { text: 'entry', timestamp: 'not-a-date' },
+    });
+
+    assert.equal(status, 400);
+    assert.match(json.error, /timestamp/i);
+  });
+
+  test('delete removes an entry and returns 200 with the new list', async () => {
+    await seedJournal('## 2026-07-20 09:00\n\na\n\n## 2026-07-19 09:00\n\nb\n');
+    const deleted = await call('/api/journal/delete', {
+      method: 'POST',
+      body: { ordinal: 0, expectedText: 'a' },
+    });
+
+    assert.equal(deleted.status, 200);
+    assert.deepEqual(deleted.json.entries.map((/** @type {{text:string}} */ e) => e.text), ['b']);
+  });
+
+  test('a stale expectedText returns 409 and leaves the file alone', async () => {
+    await seedJournal('## 2026-07-20 09:00\n\noriginal\n');
+    const { status, json } = await call('/api/journal/delete', {
+      method: 'POST',
+      body: { ordinal: 0, expectedText: 'stale text' },
+    });
+
+    assert.equal(status, 409);
+    assert.match(json.error, /changed/i);
+    assert.match(await fs.readFile(journalFile, 'utf8'), /original/);
+  });
+
+  test('GET on the delete endpoint returns 405', async () => {
+    const { status } = await call('/api/journal/delete');
     assert.equal(status, 405);
   });
 });

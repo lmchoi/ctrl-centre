@@ -1,4 +1,5 @@
 import { el, clear, api } from '../lib/dom.js';
+import { card, banner, storageLabel } from '../lib/components.js';
 
 /**
  * @typedef {import('../../types.d.ts').Task} Task
@@ -64,9 +65,9 @@ export const todoPanel = {
 
     // --- Persistent chrome (built once, contents re-rendered on change) ---
     const summary = el('p', { class: 'card-desc', text: '—' });
-    const banner = el('div', { class: 'banner', role: 'status' });
+    const errorBanner = banner();
     const listEl = el('div', { class: 'todo-list' });
-    const storageLabel = el('span', { class: 'mono todo-storage', text: '' });
+    const storage = storageLabel('todo-storage');
 
     const draftText = el('input', {
       class: 'field field-text',
@@ -124,21 +125,19 @@ export const todoPanel = {
       onclick: () => run(() => api('/api/todos/clear-completed', { method: 'POST' })),
     });
 
-    const card = el('section', { class: 'card' }, [
-      el('div', { class: 'card-header' }, [
-        el('h2', { class: 'card-title', text: 'Tasks' }),
-        summary,
-      ]),
-      el('div', { class: 'card-content' }, [
-        banner,
+    const panel = card({
+      title: 'Tasks',
+      description: summary,
+      content: [
+        errorBanner.element,
         el('div', { class: 'todo-compose' }, [draftText, draftPriority, draftDue, addButton]),
         tabsList,
         listEl,
-      ]),
-      el('div', { class: 'card-footer' }, [clearButton, storageLabel]),
-    ]);
+      ],
+      footer: [clearButton, storage.element],
+    });
 
-    clear(host).append(card);
+    clear(host).append(panel);
 
     // --- Data flow ---
 
@@ -259,11 +258,8 @@ export const todoPanel = {
       const done = state.tasks.length - remaining;
       summary.textContent = `${remaining} open · ${done} done`;
 
-      banner.textContent = state.error;
-      banner.dataset.visible = String(Boolean(state.error));
-
-      storageLabel.textContent = state.file ? `saved to ${state.file}` : '';
-      storageLabel.title = state.file; // full path, since the label ellipsizes
+      errorBanner.show(state.error);
+      storage.show(state.file);
       clearButton.disabled = state.busy || done === 0;
 
       for (const { value, button } of tabButtons) {

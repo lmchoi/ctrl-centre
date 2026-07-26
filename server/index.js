@@ -173,6 +173,6 @@ export function createServer() {
 if (import.meta.main) {
   createServer().listen(config.port, config.host, () => {
     console.log(`ctrl-centre  →  http://${config.host}:${config.port}`);
-    console.log(`todo file    →  ${config.todoFile}`);
+    console.log(`data dir     →  ${config.dir}`);
   });
 }

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { config, displayPath } from './config.js';
 import { createTodoStore } from './todos.js';
+import { createJournalStore } from './journal.js';
 
 const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const MAX_BODY_BYTES = 64 * 1024;
@@ -22,6 +23,11 @@ const MIME = {
 };
 
 const todos = createTodoStore(config.todoFile);
+// No config.journalFile — the journal store is built straight from
+// config.dir, alongside todos, rather than growing config.js a second
+// per-file constant for one more caller.
+const journalFile = path.join(config.dir, 'journal.md');
+const journal = createJournalStore(journalFile);
 
 /**
  * @param {http.ServerResponse} res
@@ -125,6 +131,13 @@ async function handleApi(req, res, pathname) {
     });
   }
 
+  if (pathname === '/api/journal' && req.method === 'GET') {
+    return sendJson(res, 200, {
+      file: displayPath(journalFile),
+      entries: await journal.list(),
+    });
+  }
+
   if (req.method !== 'POST') {
     return sendJson(res, 405, { error: 'Method not allowed.' });
   }
@@ -140,6 +153,10 @@ async function handleApi(req, res, pathname) {
       return sendJson(res, 200, { tasks: await todos.remove(body) });
     case '/api/todos/clear-completed':
       return sendJson(res, 200, { tasks: await todos.clearCompleted() });
+    case '/api/journal':
+      return sendJson(res, 201, { entries: await journal.add(body) });
+    case '/api/journal/delete':
+      return sendJson(res, 200, { entries: await journal.remove(body) });
     default:
       return sendJson(res, 404, { error: 'Unknown endpoint.' });
   }

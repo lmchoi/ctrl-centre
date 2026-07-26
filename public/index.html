@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tasks · Ctrl Centre</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>☑</text></svg>">
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/app.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">Ctrl Centre</div>
+      <nav id="nav" aria-label="Panels"></nav>
+      <div class="sidebar-footnote">More views coming soon</div>
+    </aside>
+
+    <div class="main-col">
+      <header class="topbar">
+        <h1 id="panel-title">Tasks</h1>
+        <span id="clock" class="mono topbar-clock"></span>
+      </header>
+      <main class="panel-host">
+        <div id="panel-host" class="panel-width"></div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "ctrl-centre",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal dashboard. Todo panel backed by a markdown file outside this repo.",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "todo:path": "node -e \"import('./server/config.js').then(m => console.log(m.config.todoFile))\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

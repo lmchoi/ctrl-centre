@@ -1,0 +1,5 @@
+node_modules/
+*.tmp
+
+# Safety net: personal todos live outside this repo (see README).
+todos.md

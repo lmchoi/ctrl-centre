@@ -328,3 +328,52 @@ helpers if the third does not earn itself.
    be asked "write a journal entry for me", and the format spec is duplicated in
    the template, so say they must be kept in sync; README describes the journal
    file. Test: none beyond `npm run check`.
+
+## Status
+
+All five commits done. 92 tests pass (59 before this branch, 33 new), typecheck
+clean. Commits 1–3 were implemented by a Sonnet subagent against this plan;
+commits 4–5 and all verification were done directly.
+
+### Deviations
+
+- **Commit 4 extracted `card()`, `banner()` and `storageLabel()`, not `card()`
+  and `field()`.** With both call sites in front of us, `field()` would only have
+  concatenated a class string onto three different element types, and `row()`
+  (already flagged speculative) shares almost nothing between a journal row and
+  a todo row. The banner, by contrast, was duplicated *behaviour* — the same two
+  properties set the same way — which is the kind that stops matching. Recorded
+  in ADR 0008.
+- **`server/index.js` computes `path.join(config.dir, 'journal.md')` locally**
+  rather than `config.js` growing a `journalFile` field, for one caller.
+- **`FILE_TEMPLATE` ends with exactly one trailing newline.** Required, not
+  cosmetic: `add` normalizes the gap before the first entry to one blank line, so
+  a template already in that canonical shape is what makes add-then-delete
+  byte-stable. Pinned by its own test.
+- Timestamp validation is shape-only — `2026-13-40 25:99` passes the regex. This
+  matches how the todo store treats `@YYYY-MM-DD`, so it is consistent rather
+  than newly sloppy.
+
+### Verified
+
+- `npm run check`: 92/92, typecheck clean, run with `HOME` pointed at an empty
+  temp dir; no file created at the default location.
+- **Markup identity for commit 4**: the rendered Tasks panel `innerHTML` hashed
+  `bb32e498` at 3236 chars both before and after the refactor — captured in
+  Chrome against a running server, which is the falsifiable check that line count
+  would not have given.
+- **Manual script, in Chrome**: empty state, two-paragraph entry with a
+  blank line and a two-space hard break saved and rendered with `pre-wrap`
+  intact, count going `2 entries` → `3 entries`, textarea cleared, the entry
+  landing above the older ones both on screen and in the file.
+- **Client clock**: the saved entry's heading read `13:29`, matching the
+  dashboard's own top-bar clock at that moment.
+- **On-disk shape**: preamble untouched, exactly one blank line before the new
+  heading, interior blank line and trailing two spaces preserved byte-for-byte.
+- **409 path**: hand-edited the file in an editor with the page still open, then
+  clicked delete — banner shown, entry *not* deleted, list resynced to the
+  edited text.
+- **Byte stability**: a live add-then-delete round trip through the API left the
+  file byte-identical (`Buffer.compare === 0`), with no blank-line drift and a
+  single trailing newline.
+- Both panels still switch and render correctly after the refactor.

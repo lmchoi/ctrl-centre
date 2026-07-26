@@ -49,3 +49,17 @@ the acceptance criterion, verified with `gh run` before the PR is handed over.
 2. Add the CI status badge to `README.md` — test: none beyond `npm run check`;
    cosmetic, and the badge URL is only meaningful once commit 1 is on the
    default branch.
+
+## Status
+
+Both commits done, no deviations from the design above.
+
+Verification actually performed, in place of the TDD loop this slice cannot have:
+
+- `.github/workflows/ci.yml` parsed with a YAML loader to confirm the structure
+  (`on`, `jobs.check`, the matrix) is what was intended, not just well-formed.
+- `npm run check` run with `HOME` pointed at an empty temp directory and
+  `CTRL_CENTRE_TODO_FILE` unset, to confirm the suite does not quietly depend on
+  the real `~/.ctrl-centre/todos.md`. 49/49 green, no `tsc` errors. It does not:
+  `test/server.test.js` sets `CTRL_CENTRE_TODO_FILE` per suite.
+- Remaining criterion is the PR's own check run — both matrix legs green.

@@ -1,13 +1,25 @@
 import { el, clear, api } from '../lib/dom.js';
 
+/**
+ * @typedef {import('../../types.d.ts').Task} Task
+ * @typedef {import('../../types.d.ts').Priority} Priority
+ * @typedef {import('../../types.d.ts').Panel} Panel
+ * @typedef {import('../../types.d.ts').HttpError} HttpError
+ * @typedef {'all' | 'active' | 'done'} Filter
+ */
+
+/** @type {Record<Priority, string>} */
 const PRIORITY_VARIANT = { high: 'destructive', medium: 'warning', low: 'secondary' };
+/** @type {Record<Priority, string>} */
 const PRIORITY_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
+/** @type {{ value: Filter, label: string }[]} */
 const FILTERS = [
   { value: 'all', label: 'All' },
   { value: 'active', label: 'Active' },
   { value: 'done', label: 'Done' },
 ];
 
+/** @type {Record<Filter, string>} */
 const EMPTY_LABEL = {
   all: 'No tasks yet — add one above.',
   active: 'Nothing left to do.',
@@ -25,6 +37,10 @@ function todayISO() {
   return local.toISOString().slice(0, 10);
 }
 
+/**
+ * @param {string} dateStr
+ * @returns {string}
+ */
 function formatDue(dateStr) {
   if (!dateStr) return '';
   const date = new Date(dateStr + 'T00:00:00');
@@ -32,6 +48,7 @@ function formatDue(dateStr) {
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
+/** @type {Panel} */
 export const todoPanel = {
   id: 'tasks',
   label: 'Tasks',
@@ -39,6 +56,10 @@ export const todoPanel = {
   title: 'Tasks',
 
   mount(host) {
+    /**
+     * @type {{ tasks: Task[], file: string, filter: Filter,
+     *          error: string, busy: boolean }}
+     */
     const state = { tasks: [], file: '', filter: 'all', error: '', busy: false };
 
     // --- Persistent chrome (built once, contents re-rendered on change) ---
@@ -52,7 +73,7 @@ export const todoPanel = {
       type: 'text',
       placeholder: 'Add a task…',
       'aria-label': 'Task description',
-      onkeydown: (event) => {
+      onkeydown: (/** @type {KeyboardEvent} */ event) => {
         if (event.key === 'Enter') addTask();
       },
     });
@@ -121,7 +142,10 @@ export const todoPanel = {
 
     // --- Data flow ---
 
-    /** Run a mutation, adopting the fresh task list the server returns. */
+    /**
+     * Run a mutation, adopting the fresh task list the server returns.
+     * @param {() => Promise<{ tasks?: Task[] }>} action
+     */
     async function run(action) {
       if (state.busy) return;
       state.busy = true;
@@ -131,9 +155,10 @@ export const todoPanel = {
         if (payload.tasks) state.tasks = payload.tasks;
         state.error = '';
       } catch (err) {
-        state.error = err.message;
+        const { message, status } = /** @type {HttpError} */ (err);
+        state.error = message;
         // A 409 means the file changed underneath us; resync rather than guess.
-        if (err.status === 409) await load({ keepError: true });
+        if (status === 409) await load({ keepError: true });
       } finally {
         state.busy = false;
         setBusy(false);
@@ -141,6 +166,7 @@ export const todoPanel = {
       }
     }
 
+    /** @param {{ keepError?: boolean }} [options] */
     async function load({ keepError = false } = {}) {
       try {
         const payload = await api('/api/todos');
@@ -148,7 +174,7 @@ export const todoPanel = {
         state.file = payload.file;
         if (!keepError) state.error = '';
       } catch (err) {
-        state.error = err.message;
+        state.error = /** @type {HttpError} */ (err).message;
       }
       render();
     }
@@ -171,6 +197,7 @@ export const todoPanel = {
       });
     }
 
+    /** @param {boolean} busy */
     function setBusy(busy) {
       for (const node of [draftText, draftPriority, draftDue, addButton, clearButton]) {
         node.disabled = busy;
@@ -179,6 +206,10 @@ export const todoPanel = {
 
     // --- Rendering ---
 
+    /**
+     * @param {Task} task
+     * @returns {HTMLElement}
+     */
     function renderRow(task) {
       const checkbox = el('button', {
         class: 'checkbox',
@@ -240,10 +271,11 @@ export const todoPanel = {
         button.setAttribute('aria-selected', String(state.filter === value));
       }
 
+      const { filter } = state;
       const visible = state.tasks.filter((task) =>
-        state.filter === 'all' ||
-        (state.filter === 'active' && !task.done) ||
-        (state.filter === 'done' && task.done));
+        filter === 'all' ||
+        (filter === 'active' && !task.done) ||
+        (filter === 'done' && task.done));
 
       clear(listEl);
       if (visible.length === 0) {

@@ -7,9 +7,16 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "todo:path": "node -e \"import('./server/config.js').then(m => console.log(m.config.todoFile))\""
+    "todo:path": "node -e \"import('./server/config.js').then(m => console.log(m.config.todoFile))\"",
+    "test": "node --test",
+    "typecheck": "tsc -p tsconfig.server.json && tsc -p tsconfig.client.json",
+    "check": "npm run typecheck && npm test"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
   }
 }

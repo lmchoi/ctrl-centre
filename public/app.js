@@ -1,11 +1,14 @@
-import { el, clear } from './lib/dom.js';
+import { el, clear, byId } from './lib/dom.js';
 import { todoPanel } from './panels/todo.js';
+
+/** @typedef {import('../types.d.ts').PanelEntry} PanelEntry */
 
 /**
  * Panel registry. To add a panel later: write `panels/<name>.js` exporting a
  * panel object ({ id, label, icon, title, mount(host) → cleanup }), import it,
  * and swap it in for the `panel: null` placeholder below.
  */
+/** @type {PanelEntry[]} */
 const PANELS = [
   { id: 'overview', label: 'Overview', icon: '◧', panel: null },
   { id: 'tasks', label: 'Tasks', icon: '☑', panel: todoPanel },
@@ -14,14 +17,17 @@ const PANELS = [
   { id: 'notes', label: 'Notes', icon: '▤', panel: null },
 ];
 
-const nav = document.getElementById('nav');
-const panelHost = document.getElementById('panel-host');
-const panelTitle = document.getElementById('panel-title');
-const clock = document.getElementById('clock');
+const nav = byId('nav');
+const panelHost = byId('panel-host');
+const panelTitle = byId('panel-title');
+const clock = byId('clock');
 
+/** @type {string | null} */
 let activeId = null;
+/** @type {(() => void) | null} */
 let unmountActive = null;
 
+/** @param {PanelEntry} entry */
 function activate(entry) {
   if (!entry.panel || entry.id === activeId) return;
 
@@ -32,7 +38,9 @@ function activate(entry) {
   document.title = `${entry.label} · Ctrl Centre`;
   unmountActive = entry.panel.mount(clear(panelHost)) ?? null;
 
-  for (const button of nav.querySelectorAll('.nav-item')) {
+  for (const button of /** @type {NodeListOf<HTMLElement>} */ (
+    nav.querySelectorAll('.nav-item')
+  )) {
     const isActive = button.dataset.panelId === activeId;
     if (isActive) button.setAttribute('aria-current', 'page');
     else button.removeAttribute('aria-current');
@@ -62,4 +70,5 @@ function tickClock() {
 tickClock();
 setInterval(tickClock, 1000);
 
-activate(PANELS.find((entry) => entry.panel));
+const firstImplemented = PANELS.find((entry) => entry.panel);
+if (firstImplemented) activate(firstImplemented);

@@ -1,7 +1,7 @@
 # ctrl-centre
 
-Personal dashboard. Dependency-free Node + vanilla ES modules, no build step.
-`npm start` serves http://127.0.0.1:4242.
+Personal dashboard. Node + vanilla ES modules, no runtime dependencies and no
+build step. `npm start` serves http://127.0.0.1:4242.
 
 ```
 server/index.js    HTTP: static files + JSON API
@@ -10,7 +10,16 @@ server/config.js   todo file path + port resolution
 public/app.js      panel registry, sidebar, clock
 public/panels/     one module per panel
 public/styles/     Console design system (tokens.css, base.css) + app.css
+types.d.ts         shapes shared between server and client
+test/              node --test suites
+docs/adr/          architecture decision records
 ```
+
+**Run `npm run check` (typecheck + tests) before considering work done.**
+
+Read [docs/adr](docs/adr/) before proposing an architectural change — the
+decisions there record what was already considered and rejected, and why.
+ADRs are immutable: supersede with a new one rather than editing.
 
 ## Editing the user's todos
 
@@ -69,7 +78,14 @@ behind a new `/api/<name>` route in `server/index.js`.
 
 ## Conventions
 
-- No dependencies and no build step. Keep it that way unless asked.
+- No runtime dependencies and no build step ([ADR 0003](docs/adr/0003-no-runtime-dependencies-no-build-step.md)).
+  Keep it that way unless asked. `typescript` and `@types/node` are
+  development-only and must never be imported by shipped code.
+- Types are JSDoc annotations checked by `tsc`, not TypeScript syntax
+  ([ADR 0004](docs/adr/0004-jsdoc-types-instead-of-typescript.md)). Shapes that
+  cross the server/client boundary belong in `types.d.ts`.
+- Every store method returns a promise, including on invalid input — validation
+  errors reject, they do not throw synchronously.
 - Todo text comes from a file on disk: render it with `textContent`, never
   `innerHTML`.
 - Every todo-file write is read-modify-write under a mutex, via temp file +

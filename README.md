@@ -3,12 +3,19 @@
 A personal dashboard. One panel for now — **Tasks**, backed by a plain markdown
 file that lives outside this repo.
 
-No dependencies, no build step. Node 20+.
+No runtime dependencies, no build step. Node 20+.
 
 ```sh
 npm start          # http://127.0.0.1:4242
 npm run dev        # same, restarts on change
+
+npm test           # node --test
+npm run typecheck  # tsc --noEmit over JSDoc types
+npm run check      # both
 ```
+
+`npm install` is only needed for `typecheck` — running the app needs nothing
+installed. See [docs/adr](docs/adr/) for why things are built this way.
 
 ## Where your todos live
 
@@ -87,6 +94,9 @@ public/
   lib/dom.js   DOM + fetch helpers
   panels/      one module per panel
   styles/      design tokens + component CSS
+test/          node --test suites
+types.d.ts     shapes shared between server and client
+docs/adr/      architecture decision records
 ```
 
 `styles/tokens.css` and `styles/base.css` are the Console design system —

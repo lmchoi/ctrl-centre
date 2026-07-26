@@ -1,5 +1,8 @@
 node_modules/
 *.tmp
 
+# sp slice worktrees (see CLAUDE.md → sp config).
+.claude/worktrees/
+
 # Safety net: personal todos live outside this repo (see README).
 todos.md

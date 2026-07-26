@@ -76,6 +76,19 @@ Create `public/panels/<name>.js` exporting
 registry. The sidebar entry enables itself. Server state, if needed, goes
 behind a new `/api/<name>` route in `server/index.js`.
 
+## Workflow
+
+Feature work goes through the `sp` slice workflow: `/sp:refine` → `/sp:start` →
+`/sp:implement` → `/sp:push` → `/sp:done`. Bug fixes enter at `/sp:fix`.
+Plan files live in `docs/plans/`; worktrees are created under
+`.claude/worktrees/` (gitignored).
+
+### sp config
+- test: `npm run check`
+- sync: `npm ci`
+- plans: `docs/plans/`
+- docs: `docs/adr/`
+
 ## Conventions
 
 - No runtime dependencies and no build step ([ADR 0003](docs/adr/0003-no-runtime-dependencies-no-build-step.md)).
